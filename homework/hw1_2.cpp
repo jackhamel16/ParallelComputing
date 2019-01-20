@@ -14,18 +14,15 @@ int main()
   const int x_total = 10;
   const double t_min = 0;
   const double t_max = 10;
-  const int t_total = 1000;
-  double dx = x_max / x_total;
-  double dt = t_max / t_total;
+  const int t_total = 100;
+  double dx = (x_max - x_min) / x_total;
+  double dt = (t_max - t_min) / t_total;
 
   Eigen::Matrix<double, x_total, 1> x_vec = Eigen::VectorXd::LinSpaced(x_total, x_min, x_max);
-  //Eigen::Matrix<double, t_total, 1> t_vec = Eigen::VectorXd::LinSpaced(t_total, t_min, t_max);
   Eigen::Matrix<double, Eigen::Dynamic, 1> t_vec = Eigen::VectorXd::LinSpaced(t_total, t_min, t_max);
   Eigen::Matrix<double, x_total, 1> y_vec = Eigen::MatrixXd::Zero(x_total, 1);
   Eigen::Matrix<double, x_total, 1> v_vec = Eigen::MatrixXd::Zero(x_total, 1);
   Eigen::Matrix<double, x_total, 1> a_vec = Eigen::MatrixXd::Zero(x_total, 1);
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y_mat = Eigen::MatrixXd::Zero(t_total, x_total);
-
 
   std::ofstream outfile("hw_out.dat");
   outfile << std::scientific << std::setprecision(15);
