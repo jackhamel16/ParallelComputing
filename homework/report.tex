@@ -1,0 +1,69 @@
+\documentclass[letterpaper,11pt]{article}
+\usepackage{setspace} % For double-spaced text
+\usepackage{siunitx}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{mathrsfs}
+
+\graphicspath{ {exp5.jpg} }
+% \doublespacing
+
+\title{ECE458 - Experiment 5}
+\author{Jack Hamel}
+
+\topmargin-2cm     %I recommend adding these three lines to increase the
+\textwidth16.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm
+\oddsidemargin0cm
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This lab session focused on sampling, Pulse Amplitude Modulation (PAM) and Time Division Multiplexing (TDM).  The sampling theorem describes the guidelines on the rate of sampling used to prevent aliasing and thus maintain the ability to reconstruct the signal at the receiver.  Any signal with a bandwidth of B Hertz must be sampled at a \textit{minimum} of 2B Hertz to prevent aliasing and preserve the ability to reconstruct the correct signal.  This minimum sampling frequency is known as the Nyquist Rate of the signal.  When ideally sampling a signal, mathematically, an impulse train is multiplied by the signal as shown here:
+\begin{equation}
+  x_s(t) = \sum_{n=-\infty}^\infty x(nT_s)\delta(t-nT_s)
+\end{equation}
+Where $T_s$ is chosen such that $\frac{1}{T_s}\geq 2B$.  In a real-world sampler, the impulses become pulses because the Dirac Delta function cannot exist physically.  This introduces additional considerations when sampling a signal.  These become apparent when observing the Fourier Transform of the impulse train and how it changes when using a pulse train.
+\begin{equation}
+  \sum_{n=-\infty}^\infty \delta(t-nT_s) \Longleftrightarrow f_s\sum_{n=-\infty}^\infty \delta(f-nf_s)
+\end{equation}
+With some further thought it makes sense that the Nyquist Rate will prevent aliasing using an impulse train, however, practical impulse trains are actually pulse trains.  When using pulses in the time domain, the signal is multiplied by shifted sinc functions in the frequency domain.  Now the previously infinitely thin impulses in the frequency domain have a finite width, meaning frequency content of the signal might be filtered out if the sinc is not wide enough.  Now the width of the pulses used in sampling and the sampling frequency need to be chosen with consideration to one another to avoid this problem.
+
+To reconstruct the sampled signal, a low pass filter is needed.  The frequency content of the unsampled signal is at a lower frequency than the frequencies introduced during the sampling process (assuming no aliasing is occurring).  This means the low pass filter can select only the original signal frequencies if tuned properly.
+
+PAM/TDM multiplexing is a time division method of sending multiple signals over one channel simultaneously (see FIGURE 1). The method works by splitting the channel over time into slots for each user.  Each user can send a signal only during their time slot.  To do this, each user will send a sample of their signal during their slot such that it does not interfere with other users.  On the receiver end, as long as the slot times are known, the samples can be interpolated for each user independently and all signals are recovered.  This is done by sampling at the receiver in a synchronized fashion with whichever user's signal is desired.
+\begin{figure}[H]
+  \includegraphics[scale=0.7]{exp5.jpg}
+  \caption{Two Sampled Signals in a PAM/TDM Chanel}
+\end{figure}
+
+
+\section{Procedure}
+
+The goal of the first experiment was to sample a signal, interpolate to recover it, and investigate the effects of the sampling rate.  To start, TIMS was used to generate and sample a signal.  This was done by using the sample clock of the MASTER SIGNALS module and the TWIN PULSE GENERATOR as the pulse train.  The DUAL ANANLOG SWITCH module performed sampling with the pulse train of the message sine signal from MASTER SIGNALS.  Lastly, the HEADPHONE AMPLIFIER was used to low pass filter the sampled signal to recover the message signal.
+
+To investigate how the sampling rate affects the interpolated signal the MASTER SIGNALS clock was swapped with the VCO clock to provide a variable clock frequency.  By adjusting the VCO frequency, changes in the interpolated signal were observed on the oscilloscope. 
+
+The second experiment focused on PAM/TDM multiplexing.  A TRUNKS TDM signal, needed to be variably sampled to select different users on the channel and then interpolated to recover the message signal.  To do this, The MASTER SIGNALS clock was used to generate pulses with the TWIN PULSE GENERATOR and the TRUNKS signal was sampled using the generated pulse train and the DUAL ANALOG SWITCH module.  Lastly, the HEADPHONE AMPLIFIER was used to low pass filter the sampled TDM signal.  The delay control on the TWIN PULSE GENERATOR gave control over which user was being interpolated at the end. 
+\section{Tutorial Questions}
+
+Experiment 4 questions and answers:\\
+
+\textbf{1) } Even if the signal to be sampled is already band-limited, why is it good practice to include an anti-aliasing filter? \\ \\ 
+No signal is truly band-limited so all signal will have some aliasing.  By filtering it with an anti-aliasing filter, it is assured that it does not cause interference at the receiver.
+\\ \\
+\textbf{1) }   What is the effect of (a) widening, (b) decreasing  the width of the switching pulse in the PAM/TDM receiver?\\ \\
+(a) Widening the width increases the power of the signal transmitted.\\
+(b) Decreasing the width decreases the power proportional to the decrease.
+\\ \\
+\textbf{2) } If the sampling width $\delta t$ of the channels at the PAM/TDM transmitter was reduced, more channels could be fitted into the same frame. Is there an upper limit to the number of channels which could be fitted into a PAM/TDM system made from an infinite supply of TIMS modules?\\ \\
+Yes because, as mentioned above, the power of the sampled signal decreases as the width of the samples decreases.  If signals are sampled with too thin of pulses, then the SNR will become too large and the signal will not be recoverable in the noise at the receiver.
+\\ \\
+\textbf{2) } In practice there is often a guard band interposed between the channel samples at the transmitter. This means that the maximum number of channels in a frame would be less than $\frac{T}{\delta t}$. Suggest some reasons for the guard band.\\ \\
+With a guard band, the width and phase of the pulse train generated at the receiver don't need to be perfectly synchronized with those of the desired user in the channel.  Additionally, if there is linear distortion caused by the channel, then guard zones will prevent it from causing interference with other users, assuming the distortion is small enough relative to the guard zone.
+\end{document}

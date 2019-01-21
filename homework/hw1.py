@@ -1,69 +1,60 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-
-gamma = 1
-
-xmin = 0
-xmax = 10
-nx = 500
-
-dx = (xmax - xmin)/nx
-
-tmin = 0
-tmax = 10
-nt = 10000
-
-dt = (tmax - tmin)/nt
-
-#initializing y positions
-y_pos = np.exp(-(np.linspace(xmin, xmax, nx) - 5)**2)
-y_vel = np.zeros(nx)
-y_vel2 = np.zeros(nx)
-y_acc = np.zeros(nx)
-y_acc2 = y_acc
-
-y_pos_mat = np.zeros((nt, nx))
-y_pos_mat[0][:] = y_pos
-
-for t_idx in range(0,nt - 1):
-#    y_acc2[0], y_acc2[nx - 1] = 0, 0
-    for x_idx in range(1, nx - 1):
-#        y_acc[x_idx] = gamma / dx**2 * (y_pos[x_idx + 1] + \
-#                       y_pos[x_idx - 1] - 2 * y_pos[x_idx])
-        y_acc2[x_idx] = gamma / dx**2 * (y_pos_mat[t_idx][x_idx + 1] + \
-                           y_pos_mat[t_idx][x_idx - 1] - 2 * y_pos_mat[t_idx][x_idx])
-#    y_pos = y_pos + y_vel * dt
-    y_pos_mat[t_idx + 1][:] = y_pos_mat[t_idx][:] + y_vel2 * dt
-#    y_vel = y_vel + y_acc * dt
-    y_vel2 = y_vel2 + y_acc2 * dt
-#    y_pos_mat[t_idx][:] = y_pos
-#    if t_idx == 0:
-#        if y_acc[x_idx] != gamma / dx**2 * (y_pos_mat[t_idx][x_idx + 1] + \
-#                           y_pos_mat[t_idx][x_idx - 1] - 2 * y_pos_mat[t_idx][x_idx]):
-#            print(
-#        y_acc[x_idx] = gamma / dx**2 * (y_pos_mat[t_idx][x_idx + 1] + \
-#                           y_pos_mat[t_idx][x_idx - 1] - 2 * y_pos_mat[t_idx][x_idx])
-#    y_pos_mat[t_idx][:] = y_pos_mat[t_idx][:] + y_vel * dt
-#    y_vel = y_vel + y_acc * dt
-#    y_pos_mat[t_idx][:] = y_pos
+  
+def run(nx, nt):  
+    gamma = 1
     
-#fig, ax = plt.subplots()
-fig = plt.figure()
-ax = plt.axes(xlim=(0,10), ylim=(-1,1))
-#line, = ax.plot(x_vec, y_pos_mat[0][:])
-line, = ax.plot([], [], lw=2)
-def init():  # only required for blitting to give a clean slate.
-    line.set_data([], [])
-    return(line,)
-
-
-def animate(i):
-    line.set_data(np.linspace(xmin, xmax, nx), y_pos_mat[10*i][:])  # update the data.
-    return(line,)
-
-
-ani = animation.FuncAnimation(
-    fig, animate, init_func=init, interval=30, blit=True)
-
-plt.show()
+    xmin = 0
+    xmax = 10
+#    nx = 500
+    
+    dx = (xmax - xmin)/nx
+    
+    tmin = 0
+    tmax = 10
+#    nt = 1000000
+    
+    dt = (tmax - tmin)/nt
+    
+    # animation information
+    animate = 0 # true will run the animation only if nt >= num_of_frames
+    if animate == True:
+        num_of_frames = 100
+        step_size = nt // num_of_frames
+        frame_mat = np.zeros((num_of_frames, nx))
+    
+    #initializing y positions
+    y_pos = np.exp(-(np.linspace(xmin, xmax, nx) - 5)**2)
+    y_vel = np.zeros(nx)
+    
+    if animate == True:
+        frame_mat[0][:] = y_pos
+    
+    for t_idx in range(1, nt):
+        y_vel[1:nx - 1] = y_vel[1:nx - 1] + gamma / dx**2 * dt *(y_pos[2:nx] + \
+                     y_pos[0:nx - 2] - 2 * y_pos[1:nx - 1])
+        y_pos = y_pos + y_vel * dt
+        if animate == True:
+            if t_idx % step_size == 0:
+                frame_mat[t_idx // step_size][:] = y_pos   
+        
+    if animate == True: 
+        fig = plt.figure()
+        ax = plt.axes(xlim=(0,10), ylim=(-1,1))
+        line, = ax.plot([], [], lw=2)
+        
+        def init():
+            line.set_data([], [])
+            return(line,)
+        
+        
+        def animate(i):
+            line.set_data(np.linspace(xmin, xmax, nx), frame_mat[i][:])
+            return(line,)
+        
+        
+        ani = animation.FuncAnimation(
+            fig, animate, init_func=init, interval=30, blit=True)
+        
+        plt.show()
