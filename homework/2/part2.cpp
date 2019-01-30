@@ -1,18 +1,15 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 int main()
 {
-  const int n = 3000;
+  const int bsize = 16;
+  const int n = 1000;
   vector<vector<int>> mat(n);
   vector<vector<int>> new_mat(n);
-  
-  //for(int idx = 0; idx < n; ++idx)
-  //{
-    //mat[i].resize(n);
-  //}
 
   // Filling Matrix
   for(int row = 0; row < n; ++row)
@@ -26,14 +23,20 @@ int main()
   }
      
   // Transposing Matrix
-  for(int row = 0; row < n; ++row)
+  for(int row = 0; row < n; row = row + bsize)
   {
-    for(int col = 0; col < n; ++col)
+    for(int col = 0; col < n; col = col + bsize)
     {
-      new_mat[row][col] = mat[col][row];
+        //int climit = min(row + bsize - 1, n)
+      for(int row1 = row; row1 < min(row + bsize - 1, n); ++row1)
+      {
+        for(int col1 = col; col1 < min(col + bsize - 1, n); ++col1)
+        {
+          new_mat[row1][col1] = mat[col1][row1];
+        }
+      }  
     }
   }
-
   // Printing Transpose
   //for(int row = 0; row < n; ++row)
   //{
