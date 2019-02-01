@@ -68,7 +68,7 @@ int main( int argc, char *argv[] )
     if (argc > 1) {
       matSize = atoi(argv[1]);
     }
-    printf( "Transpose %d x %d\n", matSize, matSize );
+    //printf( "Transpose %d x %d\n", matSize, matSize );
 
     n = matSize * matSize;
     matA = (double *) malloc( n * sizeof(double) );
@@ -92,9 +92,10 @@ int main( int argc, char *argv[] )
 	if (t < tLoop) tLoop = t;
     }
     
-    printf( "Time = %f\n", tLoop );
+    //printf( "Time = %f\n", tLoop );
+    printf( "%f\n", tLoop );
     rate = 8*(matSize*matSize) / tLoop;
-    printf( "Rate = %f MB/s\n", rate * 1.0e-6 );
+    //printf( "Rate = %f MB/s\n", rate * 1.0e-6 );
 
     tLoop = 1.0e10;
     for (tests=0; tests<maxTest; tests++) {
@@ -109,9 +110,9 @@ int main( int argc, char *argv[] )
 	if (t < tLoop) tLoop = t;
     }
     
-    printf( "BaseTime = %f\n", tLoop );
+    //printf( "BaseTime = %f\n", tLoop );
     rate = 8*(matSize*matSize) / tLoop;
-    printf( "Base Rate = %f MB/s\n", rate * 1.0e-6 );
+    //printf( "Base Rate = %f MB/s\n", rate * 1.0e-6 );
 
     free( matA );
     free( matB );

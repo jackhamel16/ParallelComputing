@@ -1,15 +1,24 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <time.h>
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
   const int bsize = 16;
-  const int n = 1000;
+  int n = 4000;
+  if(argc > 1)
+  {
+    n = atoi(argv[1]);
+  }
+
   vector<vector<int>> mat(n);
   vector<vector<int>> new_mat(n);
+
+  clock_t start, end;
+  double total_time;
 
   // Filling Matrix
   for(int row = 0; row < n; ++row)
@@ -23,6 +32,7 @@ int main()
   }
      
   // Transposing Matrix
+  start = clock();
   for(int row = 0; row < n; row = row + bsize)
   {
     for(int col = 0; col < n; col = col + bsize)
@@ -37,6 +47,9 @@ int main()
       }  
     }
   }
+  end = clock();
+  total_time = end - start;
+  cout << total_time / CLOCKS_PER_SEC << endl;
   // Printing Transpose
   //for(int row = 0; row < n; ++row)
   //{
