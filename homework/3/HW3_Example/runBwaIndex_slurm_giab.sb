@@ -1,0 +1,35 @@
+#!/bin/bash --login
+########## Define Resources Needed with SBATCH Lines ##########
+ 
+#SBATCH --time=4:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --ntasks=1                  # number of tasks - how many tasks (nodes) that you require (same as -n)
+#SBATCH --cpus-per-task=1           # number of CPUs (or cores) per task (same as -c)
+#SBATCH --mem=40G                    # memory required per node - amount of memory (in bytes)
+#SBATCH --job-name BWA_index_test      # you can give your job a name for easier identification (same as -J)
+ 
+ 
+########## Command Lines to Run ##########
+
+module -q load GCC/6.4.0-2.28 
+module -q load OpenMPI/2.1.1
+module -q load GNU/6.4.0-2.28 
+module -q load icc/2017.4.196-GCC-6.4.0-2.28 
+module -q load impi/2017.3.196
+module -q load ifort/2017.4.196-GCC-6.4.0-2.28  
+module -q load BWA/0.7.17                   ### load necessary modules, e.g.
+#module load GCC/6.4.0-2.28 
+#module load OpenMPI/2.1.1
+#module load GNU/6.4.0-2.28 
+#module load icc/2017.4.196-GCC-6.4.0-2.28 
+#module load impi/2017.3.196
+#module load ifort/2017.4.196-GCC-6.4.0-2.28  
+#module load BWA/0.7.17                   ### load necessary modules, e.g.
+ 
+cd /mnt/home/hameljac/Documents/CMSE401/ParallelComputing/homework/3/HW3_Example ### change to the directory where your data is located
+time srun -n 1 bwa index -a bwtsw DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_1.fq.gz  
+#time srun -n 1 bwa index -a bwtsw NIST7035_TAAGGCGA_L001_R1_001.fastq.gz             ### call your executable
+#time srun -n 1 bwa index -a bwtsw NIST7035_TAAGGCGA_L001_R2_001.fastq.gz             ### call your executable
+#srun -n 1 bwa index -a bwtsw Homo_sapiens.GRCh38.dna.toplevel.fa.gz             ### call your executable
+
+js -j $SLURM_JOB_ID -F 
+#scontrol show job $SLURM_JOB_ID     ### write job information to output file
