@@ -1,6 +1,6 @@
 #include <iostream>
 #include <omp.h>
-static long num_steps  = 10000000;
+static long num_steps  = 1000000;
 double step;
 #define NUM_THREADS 3 
 int main()
@@ -18,6 +18,7 @@ int main()
     for(i = id, sum[id] = 0; i < num_steps; i = i + nthrds)
     { 
       x = (i + 0.5) * step;
+      #pragma omp barrier
       sum[id] += 4.0/(1.0+x*x);
     }
   }
