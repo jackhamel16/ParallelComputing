@@ -1,0 +1,38 @@
+#!/bin/sh
+
+#SBATCH	--ntasks 4
+#SBATCH	--cpus-per-task 1
+#SBATCH	--mem 10GB
+#SBATCH	--time 4:00:00
+#SBATCH --job-name BWA_sequencing_example
+
+# Download reference data
+echo "Downloading reference data file..."
+wget ftp://ftp.ensembl.org/pub/release-95/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+
+# Load modules
+module -q load GCC/6.4.0-2.28
+module -q load OpenMPI/2.1.1
+module -q load BWA/0.7.17
+
+echo "Copying data files to current directory..."
+cp /mnt/scratch/colbrydi/BWA_Example_Data/DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_1.fq.gz .
+cp /mnt/scratch/colbrydi/BWA_Example_Data/DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_2.fq.gz .
+
+# Index worm genomes
+echo "Indexing Dataset 1..."
+salloc -n 1 bwa index -a bwtsw DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_1.fq.gz  
+echo "Indexing Dataset 2..."
+salloc -n 1 bwa index -a bwtsw DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_2.fq.gz  
+echo "Indexing Reference Dataset..."
+salloc -n 1 bwa index -a bwtsw Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+
+# Align Worm Genomes
+echo "Running Alignment..."
+salloc -n 4 bwa mem -t 4 Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_1.fq.gz DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_2.fq.gz > DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_1t_aln.sam 
+
+echo "Alignment Complete"
+echo "Removing data files..."
+rm DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_1.fq.gz*
+rm DataSet01_Celegans_Paired200Id200Pexp100Cov10E1N0GenomicControl_2.fq.gz*
+rm Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz*
