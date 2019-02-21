@@ -2,7 +2,7 @@
 #include <omp.h>
 static long num_steps  = 1000000;
 double step;
-#define NUM_THREADS 3 
+#define NUM_THREADS 8 
 int main()
 {
   int i, nthreads; double pi,sum[NUM_THREADS];
