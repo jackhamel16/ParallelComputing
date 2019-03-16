@@ -5,6 +5,7 @@
 #include <fftw3.h>
 
 #define NUM_POINTS 2097152
+#define N_THREADS 16
 
 /* Never mind this bit */
 
@@ -45,6 +46,9 @@ void do_something_with(fftw_complex* result) {
 /* Resume reading here */
 
 int main() {
+    fftw_init_threads();
+    fftw_plan_with_nthreads(N_THREADS);
+
     fftw_complex signal[NUM_POINTS];
     fftw_complex result[NUM_POINTS];
 
