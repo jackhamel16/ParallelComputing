@@ -1,0 +1,156 @@
+300
+400
+500
+600
+700
+Spatial size runs:
+nxy = 300, run = 1
+
+real	0m26.513s
+user	0m26.071s
+sys	0m0.050s
+nxy = 300, run = 2
+
+real	0m27.525s
+user	0m27.075s
+sys	0m0.048s
+nxy = 300, run = 3
+
+real	0m27.701s
+user	0m27.190s
+sys	0m0.047s
+nxy = 400, run = 1
+
+real	0m36.516s
+user	0m36.061s
+sys	0m0.046s
+nxy = 400, run = 2
+
+real	0m36.885s
+user	0m36.194s
+sys	0m0.054s
+nxy = 400, run = 3
+
+real	0m35.892s
+user	0m35.394s
+sys	0m0.065s
+nxy = 500, run = 1
+
+real	0m44.631s
+user	0m44.154s
+sys	0m0.056s
+nxy = 500, run = 2
+
+real	0m44.981s
+user	0m44.475s
+sys	0m0.074s
+nxy = 500, run = 3
+
+real	0m45.341s
+user	0m44.882s
+sys	0m0.045s
+nxy = 600, run = 1
+
+real	0m52.848s
+user	0m52.326s
+sys	0m0.050s
+nxy = 600, run = 2
+
+real	0m54.168s
+user	0m53.683s
+sys	0m0.064s
+nxy = 600, run = 3
+
+real	0m54.101s
+user	0m53.460s
+sys	0m0.197s
+nxy = 700, run = 1
+
+real	1m2.470s
+user	1m1.984s
+sys	0m0.058s
+nxy = 700, run = 2
+
+real	1m3.667s
+user	1m3.160s
+sys	0m0.077s
+nxy = 700, run = 3
+
+real	1m1.854s
+user	1m1.367s
+sys	0m0.048s
+nt = 6000, run = 1
+
+real	0m44.380s
+user	0m43.895s
+sys	0m0.042s
+nt = 6000, run = 2
+
+real	0m44.521s
+user	0m44.045s
+sys	0m0.052s
+nt = 6000, run = 3
+
+real	0m45.126s
+user	0m44.645s
+sys	0m0.047s
+nt = 8000, run = 1
+
+real	0m45.000s
+user	0m44.534s
+sys	0m0.040s
+nt = 8000, run = 2
+
+real	0m44.791s
+user	0m44.309s
+sys	0m0.042s
+nt = 8000, run = 3
+
+real	0m45.084s
+user	0m44.598s
+sys	0m0.045s
+nt = 10000, run = 1
+
+real	0m44.676s
+user	0m44.191s
+sys	0m0.046s
+nt = 10000, run = 2
+
+real	0m44.572s
+user	0m44.084s
+sys	0m0.059s
+nt = 10000, run = 3
+
+real	0m44.538s
+user	0m44.008s
+sys	0m0.091s
+nt = 12000, run = 1
+
+real	0m44.028s
+user	0m43.543s
+sys	0m0.048s
+nt = 12000, run = 2
+
+real	0m44.617s
+user	0m44.108s
+sys	0m0.064s
+nt = 12000, run = 3
+
+real	0m44.434s
+user	0m43.942s
+sys	0m0.055s
+nt = 14000, run = 1
+
+real	0m44.273s
+user	0m43.757s
+sys	0m0.069s
+nt = 14000, run = 2
+
+real	0m45.536s
+user	0m45.065s
+sys	0m0.042s
+nt = 14000, run = 3
+
+real	0m44.421s
+user	0m43.897s
+sys	0m0.075s

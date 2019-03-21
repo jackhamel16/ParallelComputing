@@ -1,0 +1,7 @@
+Spatial size runs:
+nxy = 300, run = 1
+
+real	2m22.455s
+user	0m29.366s
+sys	0m0.086s
+nxy = 300, run = 2
