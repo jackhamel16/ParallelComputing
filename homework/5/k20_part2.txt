@@ -1,32 +1,76 @@
 Spatial size runs:
 nxy = 300, run = 1
+Setup time: 0.005473 
+Run time: 17.687730 
+Output time: 1.402323 
 
-real	0m32.684s
-user	0m32.242s
-sys	0m0.033s
 nxy = 300, run = 2
+Setup time: 0.005150 
+Run time: 17.663637 
+Output time: 1.395207 
 
-real	0m32.699s
-user	0m32.250s
-sys	0m0.048s
 nxy = 300, run = 3
+Setup time: 0.004043 
+Run time: 17.633917 
+Output time: 1.383096 
 
-real	0m32.628s
-user	0m32.173s
-sys	0m0.040s
 nxy = 400, run = 1
+Setup time: 0.008787 
+Run time: 31.473646 
+Output time: 2.137932 
 
-real	0m41.713s
-user	0m41.268s
-sys	0m0.032s
 nxy = 400, run = 2
+Setup time: 0.008559 
+Run time: 31.505036 
+Output time: 2.128745 
 
-real	0m41.699s
-user	0m41.238s
-sys	0m0.039s
 nxy = 400, run = 3
+Setup time: 0.008396 
+Run time: 31.237912 
+Output time: 2.110981 
 
-real	0m41.706s
-user	0m41.225s
-sys	0m0.052s
 nxy = 500, run = 1
+Setup time: 0.011642 
+Run time: 48.865773 
+Output time: 2.959245 
+
+nxy = 500, run = 2
+Setup time: 0.010211 
+Run time: 49.004569 
+Output time: 2.963650 
+
+nxy = 500, run = 3
+Setup time: 0.011259 
+Run time: 49.674897 
+Output time: 2.980264 
+
+nxy = 600, run = 1
+Setup time: 0.015635 
+Run time: 71.484329 
+Output time: 3.967380 
+
+nxy = 600, run = 2
+Setup time: 0.014004 
+Run time: 70.193117 
+Output time: 3.914912 
+
+nxy = 600, run = 3
+Setup time: 0.014370 
+Run time: 70.380907 
+Output time: 4.876600 
+
+nxy = 700, run = 1
+Setup time: 0.019001 
+Run time: 95.707471 
+Output time: 4.958751 
+
+nxy = 700, run = 2
+Setup time: 0.018933 
+Run time: 96.433244 
+Output time: 4.985193 
+
+nxy = 700, run = 3
+Setup time: 0.019623 
+Run time: 95.893846 
+Output time: 4.967836 
+

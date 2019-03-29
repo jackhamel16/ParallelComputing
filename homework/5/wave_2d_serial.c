@@ -19,24 +19,27 @@ int main(int argc, char ** argv) {
     double dx2inv, dy2inv;
     char filename[sizeof "./images/file00000.png"];
 
-    if(argc >= 2)
-      nx, ny = atoi(argv[1]);
+    if(argc >= 2) {
+      nx = atoi(argv[1]);
+      ny = nx;
+    }
     else if(argc >= 3)
     {
-      nx, ny = atoi(argv[1]);
+      nx = atoi(argv[1]);
+      ny = nx;
       nt = atoi(argv[2]);
     }
 
     image_size_t sz; 
     sz.width=nx;
     sz.height=ny;
-    struct timeval time1, time2;
-    double setup_t, run_t, output_t;
+    struct timeval stime1, stime2, rtime1, rtime2, otime1, otime2;
+    double setup_t = 0, run_t = 0, output_t = 0, elapsed_t;
 
-    gettimeofday(&time1, NULL);
+    gettimeofday(&stime1, NULL);
 
     //make mesh
-    double * h_z = (double *) malloc(nx*ny*sizeof(double));
+    double * h_z = (double *) malloc(nx*ny*sizeof(double));    
     double ** z = malloc(ny * sizeof(double*));
     for (r=0; r<ny; r++)
     	z[r] = &h_z[r*nx];
@@ -78,14 +81,15 @@ int main(int argc, char ** argv) {
     	}
     }
    
-    gettimeofday(&time2, NULL);
-    setup_t = time2.tv_usec - time1.tv_usec;    
+    gettimeofday(&stime2, NULL);
+    setup_t = 1000000 * ((double)stime2.tv_sec - (double)stime1.tv_sec) + (double)stime2.tv_usec - (double)stime1.tv_usec;
 
     dx2inv=1.0/(dx*dx);
     dy2inv=1.0/(dy*dy);
 
     for(it=0;it<nt-1;it++) {
 	//printf("%d\n",it);
+	gettimeofday(&rtime1, NULL);
         for (r=1;r<ny-1;r++)  
     	    for (c=1;c<nx-1;c++)  {
 		double ax = (z[r+1][c]+z[r-1][c]-2.0*z[r][c])*dx2inv;
@@ -97,9 +101,13 @@ int main(int argc, char ** argv) {
                v[r][c] = v[r][c] + dt*a[r][c];
                z[r][c] = z[r][c] + dt*v[r][c];
             }
+        gettimeofday(&rtime2, NULL);
+        run_t += 1000000 * ((double)rtime2.tv_sec - (double)rtime1.tv_sec) + 
+                 (double)rtime2.tv_usec - (double)rtime1.tv_usec;
 
 	if (it % 100 ==0)
 	{
+            gettimeofday(&otime1, NULL);
     	    double mx,mn;
     	    mx = -999999;
             mn = 999999;
@@ -113,15 +121,17 @@ int main(int argc, char ** argv) {
                     output[r][c] = (char) round((z[r][c]-mn)/(mx-mn)*255);
 
     	    sprintf(filename, "./images/file%05d.png", frame);
-            printf("Writing %s\n",filename);    
+//            printf("Writing %s\n",filename);    
     	    write_png_file(filename,o_img,sz);
 	    frame+=1;
+            
+            gettimeofday(&otime2, NULL);
+            output_t += 1000000 * ((double)otime2.tv_sec - (double)otime1.tv_sec)
+                        + (double)otime2.tv_usec - (double)otime1.tv_usec;
         }
 
     }
-
-    gettimeofday(&time1, NULL);
-    run_t = time2.tv_usec - time1.tv_usec;// Not sure why this is not negative but it works    
+    gettimeofday(&otime1, NULL);
     
     double mx,mn;
     mx = -999999;
@@ -132,7 +142,7 @@ int main(int argc, char ** argv) {
 	   mn = min(mn, z[r][c]);
         }
 
-    printf("%f, %f\n", mn,mx);
+//    printf("%f, %f\n", mn,mx);
 
     for(r=0;r<ny;r++)
         for(c=0;c<nx;c++){  
@@ -140,15 +150,15 @@ int main(int argc, char ** argv) {
 	}
 
     sprintf(filename, "./images/file%05d.png", it);
-    printf("Writing %s\n",filename);    
+//    printf("Writing %s\n",filename);    
     //Write out output image using 1D serial pointer
     write_png_file(filename,o_img,sz);
     
-    gettimeofday(&time2, NULL);
-    output_t = time2.tv_usec - time1.tv_usec;    
+    gettimeofday(&otime2, NULL);
+    output_t += (double)otime2.tv_usec - (double)otime1.tv_usec;    
 
     printf("Setup time: %f \nRun time: %f \nOutput time: %f \n", \
-           setup_t, run_t, output_t);
+           setup_t / 1e6, run_t / 1e6, output_t / 1e6);
     
     return 0;
 }
