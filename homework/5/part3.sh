@@ -8,7 +8,7 @@ do
   for i in {1..3}
   do
     echo "nxy = $n, run = $i"
-    ./serial $n
+    ./cuda $n
     echo
   done
 done
