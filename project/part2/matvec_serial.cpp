@@ -2,7 +2,8 @@
 #include <vector>
 #include <cmath>
 #include <complex>
-#include<fftw3.h>
+#include <random>
+#include <fftw3.h>
 
 typedef std::vector<double> vecd; 
 typedef std::vector<std::vector<double>> matd; 
@@ -50,12 +51,12 @@ void testMatVec()
   std::cout << std::endl;
 }
 
-matd createCircMat(vecd circ_mat_row, int mat_dim)
+matd createCircMat(vecd circ_mat_vec, int mat_dim)
 {
-  matd circ_mat(5, vecd(5));
+  matd circ_mat(mat_dim, vecd(mat_dim));
   for(int r=0; r<mat_dim; ++r)
     for(int c=0; c<mat_dim; ++c)
-      circ_mat[r][c] = circ_mat_row[(mat_dim-r+c)%mat_dim];
+      circ_mat[c][r] = circ_mat_vec[(mat_dim-r+c)%mat_dim];
 
   return circ_mat;
 }
@@ -70,64 +71,73 @@ void printMat(matd mat, int dim)
   }
 }
 
-int main()
+int main(int argc, char** argv)
 {
-  int i;
-  vecd circ_mat_row = {4,2,5,5,7};
-  vecd vec = {2,5.2,6,6,8.9};
+  int i, size;
+  if(argc>1)
+    size = atoi(argv[1]);
+  else
+    size = 5;
+  vecd vec(size), circ_mat_vec(size), fft_sol(size), sol(size);
+  matd circ_mat;
+  std::default_random_engine generator;
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  fftw_complex circ_mat_vec_fftw[size], ft_mat_vec[size], vec_fftw[size],
+               ft_vec[size], fft_sol_fftw[size], ft_fft_sol[size];
 
-  int size = circ_mat_row.size();
-  matd circ_mat = createCircMat(circ_mat_row, size);  
-  vecd result = matVec(circ_mat, vec);  
-
-  fftw_complex circ_mat_row_fftw[size];
-  fftw_complex ft_mat_row[size];
-  fftw_complex vec_fftw[size];
-  fftw_complex ft_vec[size];
-  fftw_complex answer_fftw[size];
-  fftw_complex ft_answer[size];
-
-  fftw_plan mat_plan = fftw_plan_dft_1d(size, circ_mat_row_fftw, ft_mat_row,
-                                        FFTW_FORWARD, FFTW_ESTIMATE);
-  fftw_plan vec_plan = fftw_plan_dft_1d(size, vec_fftw, ft_vec, FFTW_FORWARD,
-                                        FFTW_ESTIMATE);
-  fftw_plan answer_plan = fftw_plan_dft_1d(size, answer_fftw, ft_answer,
-                                           FFTW_BACKWARD, FFTW_ESTIMATE);
-
-  //Fill fftw objects
+  // Generate matrix and vector
   for(i=0; i<size; ++i)
   {
-    circ_mat_row_fftw[i][REAL] = circ_mat_row[i];
-    circ_mat_row_fftw[i][IMAG] = 0.0;
+    circ_mat_vec[i] = distribution(generator);
+    vec[i] = distribution(generator);
+    circ_mat_vec_fftw[i][REAL] = circ_mat_vec[i];
+    circ_mat_vec_fftw[i][IMAG] = 0.0;
     vec_fftw[i][REAL] = vec[i];
     vec_fftw[i][IMAG] = 0.0;
   }
- 
-  fftw_execute(mat_plan);
-  fftw_execute(vec_plan);
- 
-  //effect matvec using ffts
+
+  // Get solution using traditional matvec
+  circ_mat = createCircMat(circ_mat_vec, size);  
+  sol = matVec(circ_mat, vec);  
+
+  // Set up FFT routines (plans) 
+  fftw_plan ft_mat_plan = fftw_plan_dft_1d(size, circ_mat_vec_fftw, ft_mat_vec,
+                                        FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_plan ft_vec_plan = fftw_plan_dft_1d(size, vec_fftw, ft_vec, FFTW_FORWARD,
+                                        FFTW_ESTIMATE);
+  fftw_plan ift_sol_plan = fftw_plan_dft_1d(size, ft_fft_sol, fft_sol_fftw,
+                                           FFTW_BACKWARD, FFTW_ESTIMATE);
+  // Execute initial FFTs
+  fftw_execute(ft_mat_plan);
+  fftw_execute(ft_vec_plan);
+
+  //Effect matvec using FFTs
   std::complex<double> cmplx_prod;
   for(i=0; i<size; ++i)
   {
-    cmplx_prod = std::complex<double>(ft_mat_row[i][REAL], ft_mat_row[i][IMAG])
-                 * std::complex<double>(ft_vec[i][REAL], ft_vec[i][IMAG]);
-    ft_answer[i][REAL] = cmplx_prod.real();
-    ft_answer[i][IMAG] = cmplx_prod.imag();
+    cmplx_prod = std::complex<double>(ft_mat_vec[i][REAL], ft_mat_vec[i][IMAG])
+                 * std::complex<double>(ft_vec[i][REAL], ft_vec[i][IMAG]) / 
+                 (std::complex<double>)size;
+    ft_fft_sol[i][REAL] = cmplx_prod.real();
+    ft_fft_sol[i][IMAG] = cmplx_prod.imag();
   }
 
-  fftw_execute(answer_plan);
+  // Inverse FFT solution
+  fftw_execute(ift_sol_plan);
 
-  std::cout << "Answer = \n";
-  for(i=0; i<size; ++i)
-    std::cout << answer_fftw[i][IMAG] << " ";
-  std::cout << std::endl;
+//  std::cout << "FFT Answer = \n";
+//  for(i=0; i<size; ++i)
+//    std::cout << fft_sol_fftw[i][REAL] << " ";
+//  std::cout << std::endl;
+//  std::cout << "Answer = \n";
+//  for(i=0; i<size; ++i)
+//    std::cout << sol[i] << " ";
+//  std::cout << std::endl;
 
-  fftw_destroy_plan(mat_plan);
-  fftw_destroy_plan(vec_plan); 
-  fftw_destroy_plan(answer_plan);
-
-  
+  // Cleanup
+  fftw_destroy_plan(ft_mat_plan);
+  fftw_destroy_plan(ft_vec_plan); 
+  fftw_destroy_plan(ift_sol_plan);
 
   return 0;
 }
