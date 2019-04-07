@@ -1,0 +1,9 @@
+#!/bin/bash
+
+module load libpng
+make
+
+for i in {1..10}
+do
+  time ./mill > /dev/null
+done

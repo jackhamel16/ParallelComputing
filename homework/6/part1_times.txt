@@ -1,0 +1,47 @@
+mkdir -p images
+mpicc -O3 -l png16 -o mill rumor_mill.c 
+rumor_mill.c:5:23: fatal error: /sys/time.h: No such file or directory
+ #include </sys/time.h>
+                       ^
+compilation terminated.
+make: *** [mill] Error 1
+
+real	0m18.724s
+user	0m18.192s
+sys	0m0.083s
+
+real	0m18.414s
+user	0m17.874s
+sys	0m0.073s
+
+real	0m18.637s
+user	0m17.923s
+sys	0m0.087s
+
+real	0m18.579s
+user	0m17.903s
+sys	0m0.081s
+
+real	0m18.530s
+user	0m17.952s
+sys	0m0.091s
+
+real	0m18.449s
+user	0m17.874s
+sys	0m0.087s
+
+real	0m18.423s
+user	0m17.862s
+sys	0m0.085s
+
+real	0m18.478s
+user	0m17.899s
+sys	0m0.101s
+
+real	0m18.482s
+user	0m17.881s
+sys	0m0.075s
+
+real	0m18.481s
+user	0m17.918s
+sys	0m0.085s
