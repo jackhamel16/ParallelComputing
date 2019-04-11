@@ -102,7 +102,8 @@ void writeworld(char * filename, char ** my_world, int sz_x, int sz_y) {
 int main(int argc, char **argv)
 {
    int rank, size;
-   MPI_Status;
+   MPI_Status Status;
+   MPI_Request Request;
    MPI_Init(&argc, &argv);
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
    MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -121,12 +122,13 @@ int main(int argc, char **argv)
      global_sz_x = atoi(argv[1]);
    else if (argc > 2) {
     global_sz_x = atoi(argv[1]);
-    global sz_y = atoi(argv[2]);
+    global_sz_y = atoi(argv[2]);
    }
 
-   int sz_x = sz_x 
+   int sz_x = global_sz_x; 
    int sz_y = ceil(global_sz_y / size);
 
+   printf("sizes: %d %d \n", sz_x, sz_y);
    char filename[sizeof "./images/file00000.png"];
    int img_count = 0;
 
@@ -178,101 +180,152 @@ int main(int argc, char **argv)
 
    //Main Time loop
    for(int t=0; t<num_loops;t++) {
-
-        gettimeofday(&time1, NULL);
-        //Communicate Edges
-        MPI_isend(my_world[which][1], sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD);
-        MPI_isend(my_world[which][sz_x+1], sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD);
-        MPI_BARRIER(MPI_COMM_WORLD);
-        MPI_irecv(my_world[which][0], sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, Status);
-        MPI_irecv(my_world[which][sz_x+2], sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, Status);
+     gettimeofday(&time1, NULL);
+     //Communicate Edges
+     int ubound_out[sz_x] = my_world[0][sz_y];
+     int lbound_out[sz_x] = my_world[0][1];
+     int ubound_in[sz_x];
+     int lbound_in[sz_x];
+     if(rank==0) {
+       MPI_Isend(&lbound_out, sz_x, MPI_INT, size-1, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Barrier(MPI_COMM_WORLD);
+       MPI_Irecv(&lbound_in, sz_x, MPI_INT, size-1, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+     }
+     else if(rank==size-1) {
+       MPI_Isend(&lbound_out, sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x, MPI_INT, 0, 2, MPI_COMM_WORLD, &Request);
+       MPI_Barrier(MPI_COMM_WORLD);
+       MPI_Irecv(&lbound_in, sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x, MPI_INT, 0, 1, MPI_COMM_WORLD, &Request);
+     }
+     else {
+       MPI_Isend(&lbound_out, sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Barrier(MPI_COMM_WORLD);
+       MPI_Irecv(&lbound_in, sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+     }
+     my_world[0][0] = &lbound_in;
+     my_world[0][sz_y+1] = &ubound_in;
+//   if(rank==0) {
+//     MPI_Isend(my_world[which][1], sz_x, MPI_INT, size-1, 1, MPI_COMM_WORLD, &Request);
+//     MPI_Isend(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+//     MPI_Barrier(MPI_COMM_WORLD);
+//     printf("%d here1\n",rank);
+//     MPI_Irecv(my_world[which][0], sz_x, MPI_INT, size-1, 2, MPI_COMM_WORLD, &Request);
+//     printf("%d here2\n",rank);
+//     MPI_Irecv(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+//     printf("%d here3\n",rank);
+//   }
+//   else if(rank==size-1) {
+//     MPI_Isend(my_world[which][1], sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+//     MPI_Isend(my_world[which][sz_y+1], sz_x, MPI_INT, 0, 2, MPI_COMM_WORLD, &Request);
+//     MPI_Barrier(MPI_COMM_WORLD);
+//     MPI_Irecv(my_world[which][0], sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+//     MPI_Irecv(my_world[which][sz_y+1], sz_x, MPI_INT, 0, 1, MPI_COMM_WORLD, &Request);
+//   }
+//   else {
+//     MPI_Isend(my_world[which][1], sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+//     MPI_Isend(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+//     MPI_Barrier(MPI_COMM_WORLD);
+//     MPI_Irecv(my_world[which][0], sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+//     MPI_Irecv(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+//   }
  
-        //Loop Edges
-        for (int c=1; c<sz_x+1; c++){
-           my_world[which][0][c] = my_world[which][sz_y][c];
-           my_world[which][sz_y+1][c] = my_world[which][1][c];
-        }
-// 	for (int r=1; r<sz_y+1; r++){
-//         my_world[which][r][0] = my_world[which][r][sz_x];
-//         my_world[which][r][sz_x+1] = my_world[which][r][1];
-//      }
-             
-//   	printf("Step %d\n",t);
-        int rumor_counts[NUM_RUMORS+2];
-   	for (int r=1; r<sz_y+1; r++) {
-           for (int c=1; c<sz_x+1; c++)
-	   { 
-	     my_world[!which][r][c] = my_world[which][r][c];
-	     if (my_world[which][r][c] >0) { 
-		for(int n=0;n<NUM_RUMORS+2;n++)
-                   rumor_counts[n] = 0;
-                rumor_counts[my_world[which][r-1][c]]++; 
-                rumor_counts[my_world[which][r+1][c]]++; 
-                rumor_counts[my_world[which][r][c-1]]++; 
-                rumor_counts[my_world[which][r][c+1]]++; 
+     //Loop Edges
+     for (int c=1; c<sz_x+1; c++){
+        my_world[which][0][c] = my_world[which][sz_y][c];
+        my_world[which][sz_y+1][c] = my_world[which][1][c];
+     }
+//   for (int r=1; r<sz_y+1; r++){
+//      my_world[which][r][0] = my_world[which][r][sz_x];
+//      my_world[which][r][sz_x+1] = my_world[which][r][1];
+//   }
+          
+//   printf("Step %d\n",t);
+     int rumor_counts[NUM_RUMORS+2];
+     for (int r=1; r<sz_y+1; r++) {
+        for (int c=1; c<sz_x+1; c++)
+        { 
+          my_world[!which][r][c] = my_world[which][r][c];
+          if (my_world[which][r][c] >0) { 
+     	for(int n=0;n<NUM_RUMORS+2;n++)
+                rumor_counts[n] = 0;
+             rumor_counts[my_world[which][r-1][c]]++; 
+             rumor_counts[my_world[which][r+1][c]]++; 
+             rumor_counts[my_world[which][r][c-1]]++; 
+             rumor_counts[my_world[which][r][c+1]]++; 
 
-		float rd = ((float) rand())/(float)RAND_MAX; 
-		float my_prob = 0;
-		for(int n=2;n<NUM_RUMORS+2;n++) {
-		   if (rumor_counts[n] > 0) {
-			my_prob += rumor_prob*rumor_counts[n]; 
-	           	if(rd <= my_prob) {
-	      			//printf("."); 
-		      		my_world[!which][r][c] = n;
- 		      		break;
-	           	}
-		   } 
-		}
-             }
-	   }
-        }
-
-        gettimeofday(&time2, NULL);
-        run_t += (double)time2.tv_sec - (double)time1.tv_sec + 
-                 ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
-		
-	which = !which;
-	if(t%10==0) {   
-          if(rank==0) {    
-	    //Send everything back to master for saving.
-            gettimeofday(&time1, NULL);
-
-            //Allocate space for global world
-            int global_size_with_borders = (global_sz_x+2)*(global_sz_y+2);
-            char * global_world_mem = (char *) malloc(2*global_size_with_borders*sizeof(char));
-            for (int i=0; i<global_size_with_borders; i++)
-            	global_world_mem[i] = 0; 
-        
-            char ** global_world[2];
-            global_world[0] = (char **) malloc((global_sz_y+2) * sizeof(char*));
-            global_world[1] = (char **) malloc((global_sz_y+2) * sizeof(char*));
-            for (int which=0; which < 2; which++) {
-               for (int r=0; r<(global_sz_y+2); r++)
-                  global_world[which][r] = &global_world_mem[(r*(sz_x+2))+which*global_size_with_borders];
-            }
-            // Fill global world
-            for(int r=1; r<sz_y+1; ++r) {
-              for(int c=1; c<sz_x+1; ++c) {
-                global_world[which][r][c] = my_world[which][r][c];
-              }
-            }
-            for(int proc=1; proc<size; ++proc) {
-              for(int r=1; r<sz_y; ++r) {
-                MPI_Recv(global_world[which][r], sz_x, MPI_INT, proc, r, MPI_COMM_WORLD, Status); 
-              }
-            }
-            global_world[which][
-            sprintf(filename, "./images/file%05d.png", img_count);
-   	    writeworld(filename, global_world[0], sz_x, sz_y);
-            img_count++;
-            gettimeofday(&time2, NULL);
-            output_t += (double)time2.tv_sec - (double)time1.tv_sec + 
-                        ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
+     	float rd = ((float) rand())/(float)RAND_MAX; 
+     	float my_prob = 0;
+     	for(int n=2;n<NUM_RUMORS+2;n++) {
+     	   if (rumor_counts[n] > 0) {
+     		my_prob += rumor_prob*rumor_counts[n]; 
+                	if(rd <= my_prob) {
+           			//printf("."); 
+     	      		my_world[!which][r][c] = n;
+     	      		break;
+                	}
+     	   } 
+     	}
           }
-          else {
-            for(int r=1; r<sz_y; ++r) {
-              MPI_Send(my_world[which][r], sz_x
-	}
+        }
+     }
+
+     gettimeofday(&time2, NULL);
+     run_t += (double)time2.tv_sec - (double)time1.tv_sec + 
+              ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
+     	
+     which = !which;
+     if(t%10==0) {   
+       if(rank==0) {    
+         //Send everything back to master for saving.
+         gettimeofday(&time1, NULL);
+
+         //Allocate space for global world
+         int global_size_with_borders = (global_sz_x+2)*(global_sz_y+2);
+         char * global_world_mem = (char *) malloc(2*global_size_with_borders*sizeof(char));
+         for (int i=0; i<global_size_with_borders; i++)
+         	global_world_mem[i] = 0; 
+     
+         char ** global_world[2];
+         global_world[0] = (char **) malloc((global_sz_y+2) * sizeof(char*));
+         global_world[1] = (char **) malloc((global_sz_y+2) * sizeof(char*));
+         for (int which=0; which < 2; which++) {
+            for (int r=0; r<(global_sz_y+2); r++)
+               global_world[which][r] = &global_world_mem[(r*(sz_x+2))+which*global_size_with_borders];
+         }
+         // Fill global world
+         // fill with master world
+         for(int r=1; r<sz_y+1; ++r) {
+           global_world[which][r] = my_world[which][r];
+         }
+//       for(int r=1; r<sz_y+1; ++r) {
+//         for(int c=1; c<sz_x+1; ++c) {
+//           global_world[which][r][c] = my_world[which][r][c];
+//         }
+//       }
+         // fill with all other procs' worlds
+         for(int proc=1; proc<size; ++proc) {
+           for(int r=1; r<sz_y; ++r) {
+             MPI_Recv(global_world[which][r], sz_x, MPI_INT, proc, r, MPI_COMM_WORLD, &Status); 
+           }
+         }
+         sprintf(filename, "./images/file%05d.png", img_count);
+         writeworld(filename, global_world[0], sz_x, sz_y);
+         img_count++;
+         gettimeofday(&time2, NULL);
+         output_t += (double)time2.tv_sec - (double)time1.tv_sec + 
+                     ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
+       }
+       else {
+         for(int r=1; r<sz_y; ++r) {
+           MPI_Send(my_world[which][r], sz_x, MPI_INT, 0, r, MPI_COMM_WORLD);
+         }
+       }
+     }
    } 
 
    //Write out output image using 1D serial pointer
@@ -285,9 +338,10 @@ int main(int argc, char **argv)
    gettimeofday(&time2, NULL);
    output_t += (double)time2.tv_sec - (double)time1.tv_sec + 
                ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
-   printf("Setup Time = %f\nRun Time = %f\nOutput Time = %f\n",
-          setup_t, run_t, output_t);
+//   printf("Setup Time = %f\nRun Time = %f\nOutput Time = %f\n",
+//          setup_t, run_t, output_t);
 
+   MPI_Finalize();
    return(0);
 }
 
