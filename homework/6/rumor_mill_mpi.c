@@ -151,7 +151,6 @@ int main(int argc, char **argv)
          my_world[which][r] = &world_mem[(r*(sz_x+2))+which*full_size_with_borders];
    }
 //   printf("After Allocate\n");
-
    int which = 0;
    
    //Inicialize Random World
@@ -181,68 +180,54 @@ int main(int argc, char **argv)
    //Main Time loop
    for(int t=0; t<num_loops;t++) {
      gettimeofday(&time1, NULL);
+//     printf("Before Allocating Boundaries\n");
      //Communicate Edges
-     int ubound_out[sz_x] = my_world[0][sz_y];
-     int lbound_out[sz_x] = my_world[0][1];
-     int ubound_in[sz_x];
-     int lbound_in[sz_x];
+     int* ubound_out = (int *) malloc((sz_x+2) * sizeof(int));
+     int* lbound_out = (int *) malloc((sz_x+2) * sizeof(int));
+//     printf("Before Copying\n");
+     for(int c=0; c<sz_x+2; ++c) {
+//       printf("Copying %d\n",c);
+       ubound_out[c] = my_world[0][sz_y][c];
+       lbound_out[c] = my_world[0][1][c];
+     }
+     int ubound_in[sz_x+2];
+     int lbound_in[sz_x+2];
+//     printf("Before Communicating %d\n", rank);
      if(rank==0) {
-       MPI_Isend(&lbound_out, sz_x, MPI_INT, size-1, 1, MPI_COMM_WORLD, &Request);
-       MPI_Isend(&ubound_out, sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&lbound_out, sz_x+2, MPI_INT, size-1, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x+2, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
        MPI_Barrier(MPI_COMM_WORLD);
-       MPI_Irecv(&lbound_in, sz_x, MPI_INT, size-1, 2, MPI_COMM_WORLD, &Request);
-       MPI_Irecv(&ubound_in, sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&lbound_in, sz_x+2, MPI_INT, size-1, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x+2, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
      }
      else if(rank==size-1) {
-       MPI_Isend(&lbound_out, sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
-       MPI_Isend(&ubound_out, sz_x, MPI_INT, 0, 2, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&lbound_out, sz_x+2, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x+2, MPI_INT, 0, 2, MPI_COMM_WORLD, &Request);
        MPI_Barrier(MPI_COMM_WORLD);
-       MPI_Irecv(&lbound_in, sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
-       MPI_Irecv(&ubound_in, sz_x, MPI_INT, 0, 1, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&lbound_in, sz_x+2, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x+2, MPI_INT, 0, 1, MPI_COMM_WORLD, &Request);
      }
      else {
-       MPI_Isend(&lbound_out, sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
-       MPI_Isend(&ubound_out, sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&lbound_out, sz_x+2, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x+2, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
        MPI_Barrier(MPI_COMM_WORLD);
-       MPI_Irecv(&lbound_in, sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
-       MPI_Irecv(&ubound_in, sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&lbound_in, sz_x+2, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x+2, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
      }
-     my_world[0][0] = &lbound_in;
-     my_world[0][sz_y+1] = &ubound_in;
-//   if(rank==0) {
-//     MPI_Isend(my_world[which][1], sz_x, MPI_INT, size-1, 1, MPI_COMM_WORLD, &Request);
-//     MPI_Isend(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
-//     MPI_Barrier(MPI_COMM_WORLD);
-//     printf("%d here1\n",rank);
-//     MPI_Irecv(my_world[which][0], sz_x, MPI_INT, size-1, 2, MPI_COMM_WORLD, &Request);
-//     printf("%d here2\n",rank);
-//     MPI_Irecv(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
-//     printf("%d here3\n",rank);
-//   }
-//   else if(rank==size-1) {
-//     MPI_Isend(my_world[which][1], sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
-//     MPI_Isend(my_world[which][sz_y+1], sz_x, MPI_INT, 0, 2, MPI_COMM_WORLD, &Request);
-//     MPI_Barrier(MPI_COMM_WORLD);
-//     MPI_Irecv(my_world[which][0], sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
-//     MPI_Irecv(my_world[which][sz_y+1], sz_x, MPI_INT, 0, 1, MPI_COMM_WORLD, &Request);
-//   }
-//   else {
-//     MPI_Isend(my_world[which][1], sz_x, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
-//     MPI_Isend(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
-//     MPI_Barrier(MPI_COMM_WORLD);
-//     MPI_Irecv(my_world[which][0], sz_x, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
-//     MPI_Irecv(my_world[which][sz_y+1], sz_x, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
-//   }
+     for(int c=0; c<sz_x+2; ++c) {
+       my_world[0][sz_y+1][c] = ubound_in[c];
+       my_world[0][0][c] = lbound_in[c];
+     }
  
      //Loop Edges
-     for (int c=1; c<sz_x+1; c++){
-        my_world[which][0][c] = my_world[which][sz_y][c];
-        my_world[which][sz_y+1][c] = my_world[which][1][c];
-     }
-//   for (int r=1; r<sz_y+1; r++){
-//      my_world[which][r][0] = my_world[which][r][sz_x];
-//      my_world[which][r][sz_x+1] = my_world[which][r][1];
+//   for (int c=1; c<sz_x+1; c++){
+//      my_world[which][0][c] = my_world[which][sz_y][c];
+//      my_world[which][sz_y+1][c] = my_world[which][1][c];
 //   }
+     for (int r=1; r<sz_y+1; r++){
+        my_world[which][r][0] = my_world[which][r][sz_x];
+        my_world[which][r][sz_x+1] = my_world[which][r][1];
+     }
           
 //   printf("Step %d\n",t);
      int rumor_counts[NUM_RUMORS+2];
@@ -300,29 +285,44 @@ int main(int argc, char **argv)
          // Fill global world
          // fill with master world
          for(int r=1; r<sz_y+1; ++r) {
-           global_world[which][r] = my_world[which][r];
+           for(int c=1; c<sz_x+1; ++c) {
+             global_world[0][r][c] = my_world[0][r][c];
+           }
          }
+//       for(int c=0; c<sz_x+2; ++c)
+//         printf("%d ",global_world[0][10][c]);
+//       printf("\n");
 //       for(int r=1; r<sz_y+1; ++r) {
 //         for(int c=1; c<sz_x+1; ++c) {
 //           global_world[which][r][c] = my_world[which][r][c];
 //         }
 //       }
          // fill with all other procs' worlds
+
+         int in_row[sz_x+2];
          for(int proc=1; proc<size; ++proc) {
-           for(int r=1; r<sz_y; ++r) {
-             MPI_Recv(global_world[which][r], sz_x, MPI_INT, proc, r, MPI_COMM_WORLD, &Status); 
+           for(int r=1; r<sz_y+1; ++r) {
+             MPI_Recv(&in_row, sz_x+2, MPI_INT, proc, r, MPI_COMM_WORLD, &Status); 
+             for(int c=1; c<sz_x+1; ++c) {
+              // if(t==10)printf("r=%d c=%d \n",proc*sz_y+r, c);
+               global_world[0][proc*sz_y+r][c] = in_row[c];
+             }
            }
          }
+//         printf("%d\n",global_world[0][100][999]);
          sprintf(filename, "./images/file%05d.png", img_count);
-         writeworld(filename, global_world[0], sz_x, sz_y);
+         writeworld(filename, global_world[0], global_sz_x, global_sz_y);
          img_count++;
          gettimeofday(&time2, NULL);
          output_t += (double)time2.tv_sec - (double)time1.tv_sec + 
                      ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
        }
        else {
-         for(int r=1; r<sz_y; ++r) {
-           MPI_Send(my_world[which][r], sz_x, MPI_INT, 0, r, MPI_COMM_WORLD);
+         for(int r=0; r<sz_y+2; ++r) {
+           int * out_row = (int *) malloc((sz_x+2)*sizeof(int));
+           for(int c=0; c<sz_x+2; ++c)
+             out_row[c] = my_world[0][r][c];
+           MPI_Send(&out_row, sz_x+2, MPI_INT, 0, r, MPI_COMM_WORLD);
          }
        }
      }
@@ -330,14 +330,10 @@ int main(int argc, char **argv)
 
    //Write out output image using 1D serial pointer
    //writeworld("end.png", world_mem, sz_x, sz_y);
-   gettimeofday(&time1, NULL);
 //   printf("After Loop\n");
    free(my_world[0]);
    free(my_world[1]);
 //   printf("After Clean up\n");
-   gettimeofday(&time2, NULL);
-   output_t += (double)time2.tv_sec - (double)time1.tv_sec + 
-               ((double)time2.tv_usec - (double)time1.tv_usec)/1e6;
 //   printf("Setup Time = %f\nRun Time = %f\nOutput Time = %f\n",
 //          setup_t, run_t, output_t);
 
