@@ -194,25 +194,25 @@ int main(int argc, char **argv)
      int lbound_in[sz_x+2];
 //     printf("Before Communicating %d\n", rank);
      if(rank==0) {
-       MPI_Isend(&lbound_out, sz_x+2, MPI_INT, size-1, 1, MPI_COMM_WORLD, &Request);
-       MPI_Isend(&ubound_out, sz_x+2, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&lbound_out, sz_x+2, MPI_BYTE, size-1, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x+2, MPI_BYTE, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
        MPI_Barrier(MPI_COMM_WORLD);
-       MPI_Irecv(&lbound_in, sz_x+2, MPI_INT, size-1, 2, MPI_COMM_WORLD, &Request);
-       MPI_Irecv(&ubound_in, sz_x+2, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&lbound_in, sz_x+2, MPI_BYTE, size-1, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x+2, MPI_BYTE, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
      }
      else if(rank==size-1) {
-       MPI_Isend(&lbound_out, sz_x+2, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
-       MPI_Isend(&ubound_out, sz_x+2, MPI_INT, 0, 2, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&lbound_out, sz_x+2, MPI_BYTE, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x+2, MPI_BYTE, 0, 2, MPI_COMM_WORLD, &Request);
        MPI_Barrier(MPI_COMM_WORLD);
-       MPI_Irecv(&lbound_in, sz_x+2, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
-       MPI_Irecv(&ubound_in, sz_x+2, MPI_INT, 0, 1, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&lbound_in, sz_x+2, MPI_BYTE, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x+2, MPI_BYTE, 0, 1, MPI_COMM_WORLD, &Request);
      }
      else {
-       MPI_Isend(&lbound_out, sz_x+2, MPI_INT, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
-       MPI_Isend(&ubound_out, sz_x+2, MPI_INT, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&lbound_out, sz_x+2, MPI_BYTE, (rank-1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Isend(&ubound_out, sz_x+2, MPI_BYTE, (rank+1)%size, 2, MPI_COMM_WORLD, &Request);
        MPI_Barrier(MPI_COMM_WORLD);
-       MPI_Irecv(&lbound_in, sz_x+2, MPI_INT, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
-       MPI_Irecv(&ubound_in, sz_x+2, MPI_INT, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&lbound_in, sz_x+2, MPI_BYTE, (rank-1)%size, 2, MPI_COMM_WORLD, &Request);
+       MPI_Irecv(&ubound_in, sz_x+2, MPI_BYTE, (rank+1)%size, 1, MPI_COMM_WORLD, &Request);
      }
      for(int c=0; c<sz_x+2; ++c) {
        my_world[0][sz_y+1][c] = ubound_in[c];
@@ -302,7 +302,7 @@ int main(int argc, char **argv)
          int in_row[sz_x+2];
          for(int proc=1; proc<size; ++proc) {
            for(int r=1; r<sz_y+1; ++r) {
-             MPI_Recv(&in_row, sz_x+2, MPI_INT, proc, r, MPI_COMM_WORLD, &Status); 
+             MPI_Recv(&in_row, sz_x+2, MPI_BYTE, proc, r, MPI_COMM_WORLD, &Status); 
              for(int c=1; c<sz_x+1; ++c) {
               // if(t==10)printf("r=%d c=%d \n",proc*sz_y+r, c);
                global_world[0][proc*sz_y+r][c] = in_row[c];
@@ -322,7 +322,7 @@ int main(int argc, char **argv)
            int * out_row = (int *) malloc((sz_x+2)*sizeof(int));
            for(int c=0; c<sz_x+2; ++c)
              out_row[c] = my_world[0][r][c];
-           MPI_Send(&out_row, sz_x+2, MPI_INT, 0, r, MPI_COMM_WORLD);
+           MPI_Send(&out_row, sz_x+2, MPI_BYTE, 0, r, MPI_COMM_WORLD);
          }
        }
      }
