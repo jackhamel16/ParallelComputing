@@ -3,13 +3,19 @@
 
 #include "matvec.h"
 
-#define N_THREADS 16
+#define N_THREADS 32
 
 int main(int argc, char** argv)
 {
   int i, size;
-  if(argc>1)
+  int n_threads = N_THREADS;
+  if(argc>2) {
     size = atoi(argv[1]);
+    n_threads = atoi(argv[2]);
+  }
+  else if(argc>1) {
+    size = atoi(argv[1]);
+  }
   else
     size = 5;
   std::default_random_engine generator;
@@ -20,6 +26,7 @@ int main(int argc, char** argv)
   std::chrono::duration<double> slow_time, fft_time; 
 
   // Generate matrix and vector
+  #pragma parallel for private(distribution, generator)
   for(i=0; i<size; ++i)
   {
     circ_mat_vec_fftw[i][REAL] = distribution(generator);
@@ -28,11 +35,13 @@ int main(int argc, char** argv)
     vec_fftw[i][IMAG] = 0.0;
   }
 
+
   start = std::chrono::high_resolution_clock::now();
+  std::cout << "Using " << n_threads << " threads\n";
 
   // Set up FFT routines (plans) 
   fftw_init_threads();
-  fftw_plan_with_nthreads(N_THREADS);
+  fftw_plan_with_nthreads(n_threads);
 
   fftw_plan ft_mat_plan = fftw_plan_dft_1d(size, circ_mat_vec_fftw, ft_mat_vec,
                                         FFTW_FORWARD, FFTW_ESTIMATE);
