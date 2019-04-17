@@ -7,22 +7,33 @@
 
 int main(int argc, char** argv)
 {
-  int i, size;
-  if(argc>1)
+  int i, size, n_threads;
+  if(argc>2) {
     size = atoi(argv[1]);
-  else
+    n_threads = atoi(argv[2]);
+  }
+  else if(argc>1) {
+    size = atoi(argv[1]);
+    n_threads = N_THREADS;
+  }
+  else {
     size = 5;
-  std::default_random_engine generator;
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    n_threads = N_THREADS;
+  }
+
   fftw_complex circ_mat_vec_fftw[size], ft_mat_vec[size], vec_fftw[size],
                ft_vec[size], fft_sol_fftw[size], ft_fft_sol[size];
   std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
   std::chrono::duration<double> slow_time, fft_time; 
 
+  omp_set_num_threads(n_threads);
+
   // Generate matrix and vector
   #pragma omp parallel for
   for(i=0; i<size; ++i)
   {
+    std::default_random_engine generator;
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
     circ_mat_vec_fftw[i][REAL] = distribution(generator);
     circ_mat_vec_fftw[i][IMAG] = 0.0;
     vec_fftw[i][REAL] = distribution(generator);
@@ -33,7 +44,7 @@ int main(int argc, char** argv)
 
   // Set up FFT routines (plans) 
   fftw_init_threads();
-  fftw_plan_with_nthreads(N_THREADS);
+  fftw_plan_with_nthreads(n_threads);
 
   fftw_plan ft_mat_plan = fftw_plan_dft_1d(size, circ_mat_vec_fftw, ft_mat_vec,
                                         FFTW_FORWARD, FFTW_ESTIMATE);

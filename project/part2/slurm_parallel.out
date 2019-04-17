@@ -1,0 +1,78 @@
+Parallel Timing Study
+Threads =  1
+Parallel Time: 1.69566 s
+Parallel Time: 1.6866 s
+Parallel Time: 1.66752 s
+Threads =  2
+Parallel Time: 1.69179 s
+Parallel Time: 1.72379 s
+Parallel Time: 1.75071 s
+Threads =  4
+Parallel Time: 1.71403 s
+Parallel Time: 1.72629 s
+Parallel Time: 1.69343 s
+Threads =  8
+Parallel Time: 1.70467 s
+Parallel Time: 1.72576 s
+Parallel Time: 1.70637 s
+Threads =  16
+Parallel Time: 1.79391 s
+Parallel Time: 1.79712 s
+Parallel Time: 1.79227 s
+Threads =  32
+Parallel Time: 1.83608 s
+Parallel Time: 1.8077 s
+Parallel Time: 1.76245 s
+Size =  1000
+Parallel Time: 0.0023933 s
+Parallel Time: 0.00218287 s
+Parallel Time: 0.0022009 s
+Size =  10000
+Parallel Time: 0.0035096 s
+Parallel Time: 0.00336265 s
+Parallel Time: 0.00333254 s
+Size =  100000
+Parallel Time: 0.0148124 s
+Parallel Time: 0.014544 s
+Parallel Time: 0.0142567 s
+Size =  1000000
+Parallel Time: 0.160661 s
+Parallel Time: 0.162171 s
+Parallel Time: 0.162423 s
+Size =  10000000
+Parallel Time: 1.76424 s
+Parallel Time: 1.79465 s
+Parallel Time: 1.79051 s
+Size =  100000000
+Parallel Time: 20.5016 s
+Parallel Time: 20.4879 s
+Parallel Time: 20.4878 s
+JobId=16372455 JobName=timing_parallel.sh
+   UserId=hameljac(814071) GroupId=cmse(2362) MCS_label=N/A
+   Priority=641714 Nice=0 Account=general QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:04:55 TimeLimit=01:00:00 TimeMin=N/A
+   SubmitTime=2019-04-16T22:17:31 EligibleTime=2019-04-16T22:17:31
+   AccrueTime=2019-04-16T22:17:31
+   StartTime=2019-04-16T22:17:32 EndTime=2019-04-16T23:17:32 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2019-04-16T22:17:32
+   Partition=general-short AllocNode:Sid=dev-intel14:7073
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=csm-020,css-[059-062,072-074,080-085,088-096,115-123]
+   BatchHost=csm-020
+   NumNodes=32 NumCPUs=32 NumTasks=32 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=32,mem=1664G,node=32,billing=258998
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=52G MinTmpDiskNode=0
+   Features=[intel14|intel16|intel18] DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/timing_parallel.sh
+   WorkDir=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2
+   Comment=stdout=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16372455.out 
+   StdErr=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16372455.out
+   StdIn=/dev/null
+   StdOut=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16372455.out
+   Power=
+

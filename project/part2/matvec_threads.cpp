@@ -18,17 +18,17 @@ int main(int argc, char** argv)
   }
   else
     size = 5;
-  std::default_random_engine generator;
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
   fftw_complex circ_mat_vec_fftw[size], ft_mat_vec[size], vec_fftw[size],
                ft_vec[size], fft_sol_fftw[size], ft_fft_sol[size];
   std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
   std::chrono::duration<double> slow_time, fft_time; 
 
   // Generate matrix and vector
-  #pragma parallel for private(distribution, generator)
+  #pragma omp parallel for
   for(i=0; i<size; ++i)
   {
+    std::default_random_engine generator;
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
     circ_mat_vec_fftw[i][REAL] = distribution(generator);
     circ_mat_vec_fftw[i][IMAG] = 0.0;
     vec_fftw[i][REAL] = distribution(generator);
@@ -37,7 +37,6 @@ int main(int argc, char** argv)
 
 
   start = std::chrono::high_resolution_clock::now();
-  std::cout << "Using " << n_threads << " threads\n";
 
   // Set up FFT routines (plans) 
   fftw_init_threads();

@@ -1,0 +1,48 @@
+Serial Timing Study
+Serial FFT Time: 0.000654542 s
+Serial FFT Time: 0.000618088 s
+Serial FFT Time: 0.000619634 s
+Serial FFT Time: 0.00183482 s
+Serial FFT Time: 0.00168141 s
+Serial FFT Time: 0.00175805 s
+Serial FFT Time: 0.0124489 s
+Serial FFT Time: 0.0120123 s
+Serial FFT Time: 0.0126368 s
+Serial FFT Time: 0.16348 s
+Serial FFT Time: 0.171822 s
+Serial FFT Time: 0.169072 s
+Serial FFT Time: 1.72008 s
+Serial FFT Time: 1.76485 s
+Serial FFT Time: 1.7505 s
+Serial FFT Time: 22.6827 s
+Serial FFT Time: 22.6694 s
+Serial FFT Time: 22.74 s
+JobId=16370808 JobName=timing_serial.sh
+   UserId=hameljac(814071) GroupId=cmse(2362) MCS_label=N/A
+   Priority=589156 Nice=0 Account=general QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:03:12 TimeLimit=00:10:00 TimeMin=N/A
+   SubmitTime=2019-04-16T20:52:01 EligibleTime=2019-04-16T20:52:01
+   AccrueTime=2019-04-16T20:52:01
+   StartTime=2019-04-16T20:53:15 EndTime=2019-04-16T21:03:15 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2019-04-16T20:53:15
+   Partition=general-short AllocNode:Sid=dev-intel14:7073
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=css-067
+   BatchHost=css-067
+   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=1,mem=52G,node=1,billing=8093
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=52G MinTmpDiskNode=0
+   Features=[intel14|intel16|intel18] DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/timing_serial.sh
+   WorkDir=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2
+   Comment=stdout=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16370808.out 
+   StdErr=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16370808.out
+   StdIn=/dev/null
+   StdOut=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16370808.out
+   Power=
+

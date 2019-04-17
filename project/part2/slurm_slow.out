@@ -1,0 +1,46 @@
+Slow Timing Study
+Size =  100
+Serial Slow Time: 0.000167126 s
+Serial Slow Time: 0.000180864 s
+Serial Slow Time: 0.000167815 s
+Size =  1000
+Serial Slow Time: 0.0152307 s
+Serial Slow Time: 0.0145129 s
+Serial Slow Time: 0.0142199 s
+Size =  10000
+Serial Slow Time: 1.69664 s
+Serial Slow Time: 1.70233 s
+Serial Slow Time: 1.68734 s
+Size =  100000
+/var/lib/slurmd/job16371065/slurm_script: line 14: 50661 Killed                  ./slow $size
+/var/lib/slurmd/job16371065/slurm_script: line 14: 50764 Killed                  ./slow $size
+/var/lib/slurmd/job16371065/slurm_script: line 14: 50917 Killed                  ./slow $size
+JobId=16371065 JobName=timing_slow.sh
+   UserId=hameljac(814071) GroupId=cmse(2362) MCS_label=N/A
+   Priority=589056 Nice=0 Account=general QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:02:23 TimeLimit=00:30:00 TimeMin=N/A
+   SubmitTime=2019-04-16T21:11:55 EligibleTime=2019-04-16T21:11:55
+   AccrueTime=2019-04-16T21:11:55
+   StartTime=2019-04-16T21:13:06 EndTime=2019-04-16T21:43:06 Deadline=N/A
+   PreemptTime=None SuspendTime=None SecsPreSuspend=0
+   LastSchedEval=2019-04-16T21:13:05
+   Partition=general-short AllocNode:Sid=dev-intel14:7073
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=css-067
+   BatchHost=css-067
+   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   TRES=cpu=1,mem=52G,node=1,billing=8093
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=52G MinTmpDiskNode=0
+   Features=[intel14|intel16|intel18] DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/timing_slow.sh
+   WorkDir=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2
+   Comment=stdout=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16371065.out 
+   StdErr=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16371065.out
+   StdIn=/dev/null
+   StdOut=/mnt/home/hameljac/Documents/CMSE401/ParallelComputing/project/part2/slurm-16371065.out
+   Power=
+
